@@ -17,14 +17,14 @@ export default function Home() {
       {/* Hero Section — layered depth stack */}
       <section className="relative w-full h-screen overflow-hidden">
 
-        {/* ── LAYER 1: Sky / Clouds background (z-0) ── */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/clouds.png"
-            alt="Himalayan sky and clouds"
-            fill
-            className="object-cover object-top"
-            priority
+        {/* ── LAYER 1: Cloud timelapse video background (z-0) ── */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <video
+            src="/clouds.mp4"
+            autoPlay
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover object-top"
           />
           <div className="absolute inset-0 bg-black/20" />
         </div>
@@ -32,12 +32,8 @@ export default function Home() {
         {/* ── LAYER 2 (z-10): "Embark Your Journey" headline — BELOW the foreground ── */}
         {/* Mountains will cut OVER the text creating a depth illusion */}
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-start pt-32 md:pt-36 px-4 pointer-events-none">
-          <h1 className="text-center text-6xl md:text-8xl lg:text-9xl font-heading font-bold text-white leading-[1.05] tracking-tight drop-shadow-2xl">
-            Embark{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFD6A3] to-[#F77F00]">
-              Your
-            </span>{" "}
-            Journey
+          <h1 className="text-7xl md:text-9xl lg:text-[10rem] font-heading font-bold text-white/85 leading-[1.0] tracking-tight drop-shadow-2xl">
+            Embark Your Journey
           </h1>
         </div>
 
