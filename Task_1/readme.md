@@ -1,1 +1,0 @@
-MACHHAPUCHHRE Has won.
