@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { CloudLightning, MapPin, PlaneTakeoff, Clock, Calendar, Compass, Heart, X, Mountain, Utensils, Camera, Sun, ChevronRight, Bike, ChevronLeft, Star, ArrowLeftRight, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useToast } from "@/components/ToastProvider";
+
+const NepalMap = dynamic(() => import("@/components/NepalMap"), { ssr: false });
 
 /* ── Data ── */
 const MONTHLY_STATS = [
@@ -22,15 +25,6 @@ const MONTHLY_STATS = [
     { month: "Dec", trips: 1, hours: 10 },
 ];
 
-const MAP_MARKERS = [
-    { id: "kathmandu", name: "Kathmandu", x: 55, y: 42, desc: "Cultural capital, UNESCO sites", temp: "24°C" },
-    { id: "pokhara", name: "Pokhara", x: 38, y: 38, desc: "Lake city, Annapurna gateway", temp: "22°C" },
-    { id: "chitwan", name: "Chitwan", x: 42, y: 62, desc: "Wildlife safari, jungle tours", temp: "28°C" },
-    { id: "lumbini", name: "Lumbini", x: 30, y: 65, desc: "Birthplace of Buddha", temp: "26°C" },
-    { id: "ebc", name: "Everest BC", x: 78, y: 25, desc: "World's highest base camp", temp: "−8°C" },
-    { id: "nagarkot", name: "Nagarkot", x: 62, y: 38, desc: "Sunrise over Himalayas", temp: "18°C" },
-];
-
 const COMPARE_DESTINATIONS = [
     { name: "Kathmandu", altitude: "1,400m", bestTime: "Oct–Dec", budget: "$30/day", style: "Cultural", rating: 4.8, image: "/kathmandu_valley_bento_1772693909729.png" },
     { name: "Pokhara", altitude: "827m", bestTime: "Sep–Nov", budget: "$25/day", style: "Adventure", rating: 4.7, image: "/pokhara_lake_bento_1772693938781.png" },
@@ -46,7 +40,6 @@ const RECOMMENDATIONS = [
 
 export default function DashboardPage() {
     const [showItinerary, setShowItinerary] = useState(false);
-    const [activeMarker, setActiveMarker] = useState<string | null>(null);
     const [chartMetric, setChartMetric] = useState<"trips" | "hours">("trips");
     const carouselRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
@@ -270,34 +263,7 @@ export default function DashboardPage() {
             {/* ───────── Map-Based Interface ───────── */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <h2 className="text-lg font-heading font-bold text-charcoal mb-4">Explore Nepal</h2>
-                <div className="relative bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 rounded-xl overflow-hidden" style={{ height: 340 }}>
-                    {/* Simple SVG Nepal outline */}
-                    <svg viewBox="0 0 100 80" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
-                        <path d="M10,45 Q15,30 25,28 Q35,25 45,22 Q55,18 65,20 Q75,22 85,28 Q90,32 92,38 Q90,50 80,58 Q70,65 55,68 Q40,70 25,65 Q15,58 10,45Z" fill="none" stroke="#2C7DA0" strokeWidth="0.5" strokeDasharray="2,1" opacity="0.4" />
-                        {MAP_MARKERS.map(m => (
-                            <g key={m.id} className="cursor-pointer" onClick={() => { setActiveMarker(activeMarker === m.id ? null : m.id); toast(`Viewing ${m.name}`, "info"); }}>
-                                <circle cx={m.x} cy={m.y} r={activeMarker === m.id ? 3 : 2} fill={activeMarker === m.id ? "#F77F00" : "#2C7DA0"} className="transition-all duration-300" />
-                                <circle cx={m.x} cy={m.y} r={activeMarker === m.id ? 5 : 0} fill="none" stroke="#F77F00" strokeWidth="0.5" className="transition-all duration-300" opacity={activeMarker === m.id ? 1 : 0} />
-                                <text x={m.x} y={m.y - 4} textAnchor="middle" fontSize="2.5" fill="#1a1a2e" fontWeight="600">{m.name}</text>
-                            </g>
-                        ))}
-                    </svg>
-                    {/* Active marker tooltip */}
-                    {activeMarker && (() => {
-                        const m = MAP_MARKERS.find(m => m.id === activeMarker)!;
-                        return (
-                            <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-xl p-4 shadow-lg border border-gray-100 animate-[fadeIn_200ms_ease-out]">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="font-heading font-bold text-charcoal">{m.name}</h3>
-                                        <p className="text-xs text-gray-500">{m.desc}</p>
-                                    </div>
-                                    <span className="text-sm font-bold text-[#F77F00]">{m.temp}</span>
-                                </div>
-                            </div>
-                        );
-                    })()}
-                </div>
+                <NepalMap />
             </div>
 
             {/* ───────── Comparison View ───────── */}

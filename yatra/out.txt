@@ -1,9 +1,15 @@
 
+D:\code\AntiGravity\Cheat Better\yatra\src\app\dashboard\page.tsx
+    3:28   warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+    4:172  warning  'ZoomIn' is defined but never used     @typescript-eslint/no-unused-vars
+  310:51   warning  'i' is defined but never used          @typescript-eslint/no-unused-vars
+
 D:\code\AntiGravity\Cheat Better\yatra\src\app\dashboard\settings\page.tsx
   4:10  warning  'Settings' is defined but never used  @typescript-eslint/no-unused-vars
 
 D:\code\AntiGravity\Cheat Better\yatra\src\app\search\page.tsx
-  1:3  error  Parsing error: Identifier expected
+    6:58  warning  'Tent' is defined but never used                                 @typescript-eslint/no-unused-vars
+  504:56  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
 
-✖ 2 problems (1 error, 1 warning)
+✖ 6 problems (1 error, 5 warnings)
 
