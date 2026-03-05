@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, Filter, Star, Mountain, Camera, Tent, ChevronRight, Heart, X } from "lucide-react";
 import Image from "next/image";
@@ -50,15 +51,26 @@ const DESTINATION_DATA = [
     },
 ];
 
-export default function SearchPage() {
+function SearchContent() {
+    const searchParams = useSearchParams();
     const [activeCategory, setActiveCategory] = useState("All");
-    const [query, setQuery] = useState("");
+    const [query, setQuery] = useState(searchParams.get("q") || "");
     const [savedIds, setSavedIds] = useState<number[]>([2]);
+    const [selectedDestination, setSelectedDestination] = useState<typeof DESTINATION_DATA[0] | null>(null);
+
+    // Update query if URL changes
+    useEffect(() => {
+        const q = searchParams.get("q");
+        if (q !== null) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setQuery(q);
+        }
+    }, [searchParams]);
 
     const filtered = DESTINATION_DATA.filter(
         (d) =>
             (activeCategory === "All" || d.category === activeCategory) &&
-            d.name.toLowerCase().includes(query.toLowerCase())
+            (d.name.toLowerCase().includes(query.toLowerCase()) || d.region.toLowerCase().includes(query.toLowerCase()))
     );
 
     const toggleSaved = (id: number) => {
@@ -121,8 +133,8 @@ export default function SearchPage() {
                             key={cat}
                             onClick={() => setActiveCategory(cat)}
                             className={`shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${activeCategory === cat
-                                    ? "bg-[#2C7DA0] text-white shadow-md"
-                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                ? "bg-[#2C7DA0] text-white shadow-md"
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                                 }`}
                         >
                             {cat}
@@ -237,11 +249,11 @@ export default function SearchPage() {
                                                 </span>
                                             </div>
 
-                                            <Link href={`/destinations/${dest.id}`}>
-                                                <button className="bg-[#2C7DA0] hover:bg-[#1B4E66] text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors flex items-center gap-1">
-                                                    Explore <ChevronRight size={14} />
-                                                </button>
-                                            </Link>
+                                            <button
+                                                onClick={() => setSelectedDestination(dest)}
+                                                className="bg-[#2C7DA0] hover:bg-[#1B4E66] text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors flex items-center gap-1">
+                                                Explore <ChevronRight size={14} />
+                                            </button>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -250,6 +262,148 @@ export default function SearchPage() {
                     )}
                 </AnimatePresence>
             </div>
+
+            {/* Destination Slide-Over Panel */}
+            <AnimatePresence>
+                {selectedDestination && (
+                    <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setSelectedDestination(null)}>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                        />
+
+                        {/* Panel */}
+                        <motion.div
+                            initial={{ x: "100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "100%" }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="relative w-full md:w-[600px] h-full bg-white shadow-2xl overflow-y-auto"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Hero Image Header */}
+                            <div className="relative h-72">
+                                <Image
+                                    src={selectedDestination.image}
+                                    alt={selectedDestination.name}
+                                    fill
+                                    className="object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+                                <button
+                                    onClick={() => setSelectedDestination(null)}
+                                    className="absolute top-6 right-6 w-10 h-10 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/40 transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+
+                                <div className="absolute bottom-6 left-6 right-6">
+                                    <div className="flex gap-2 mb-3">
+                                        <span className="bg-[#F77F00] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                                            {selectedDestination.category}
+                                        </span>
+                                    </div>
+                                    <h2 className="text-3xl md:text-4xl font-heading font-bold text-white mb-1 drop-shadow-lg">
+                                        {selectedDestination.name}
+                                    </h2>
+                                    <div className="flex items-center gap-4 text-white/90 text-sm font-medium drop-shadow-md">
+                                        <span className="flex items-center gap-1"><MapPin size={16} /> {selectedDestination.region}</span>
+                                        <div className="flex items-center gap-1">
+                                            <Star size={16} className="text-[#F77F00] fill-[#F77F00]" />
+                                            <span>{selectedDestination.rating} ({selectedDestination.reviews.toLocaleString()} reviews)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-8 space-y-8">
+                                {/* Quick Stats */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#2C7DA0] flex items-center justify-center shrink-0">
+                                            <Camera size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">Duration</p>
+                                            <p className="font-bold text-charcoal">{selectedDestination.duration}</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                            <Mountain size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">Difficulty</p>
+                                            <p className="font-bold text-charcoal">{selectedDestination.difficulty}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Placeholder Content Sections */}
+                                <div className="space-y-6">
+                                    <section>
+                                        <h3 className="text-xl font-heading font-bold text-charcoal mb-3">About this place</h3>
+                                        <p className="text-gray-600 leading-relaxed font-medium">
+                                            Experience the breathtaking beauty and rich culture of {selectedDestination.name}.
+                                            This iconic destination offers an unforgettable journey through the heart of {selectedDestination.region}.
+                                            Whether you're looking for adventure or tranquility, this carefully curated experience will leave you with memories that last a lifetime.
+                                        </p>
+                                    </section>
+
+                                    <section>
+                                        <h3 className="text-xl font-heading font-bold text-charcoal mb-3">Highlights</h3>
+                                        <div className="space-y-2">
+                                            {[
+                                                "Stunning panoramic views of the surrounding landscapes",
+                                                "Immersive cultural experiences with local communities",
+                                                "Expertly guided tours providing deep historical context",
+                                                "Comfortable accommodations in scenic locations"
+                                            ].map((highlight, idx) => (
+                                                <div key={idx} className="flex items-start gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-[#2C7DA0]/10 text-[#2C7DA0] flex items-center justify-center shrink-0 mt-0.5">
+                                                        <ChevronRight size={14} />
+                                                    </div>
+                                                    <p className="text-gray-600 font-medium">{highlight}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </div>
+
+                                {/* Action Bar */}
+                                <div className="pt-6 border-t border-gray-100 flex gap-4">
+                                    <button
+                                        onClick={() => toggleSaved(selectedDestination.id)}
+                                        className="w-14 h-14 rounded-xl flex items-center justify-center border-2 border-gray-200 text-gray-400 hover:border-[#F77F00] hover:text-[#F77F00] transition-colors shrink-0 bg-white"
+                                    >
+                                        <Heart
+                                            size={24}
+                                            className={savedIds.includes(selectedDestination.id) ? "fill-[#F77F00] text-[#F77F00]" : ""}
+                                        />
+                                    </button>
+                                    <Link href={`/destinations/${selectedDestination.id}`} className="flex-1">
+                                        <button className="w-full h-14 bg-[#2C7DA0] text-white font-bold rounded-xl hover:bg-[#1B4E66] transition-colors shadow-lg shadow-[#2C7DA0]/30 hover:shadow-xl hover:-translate-y-0.5 transform">
+                                            View Full Details
+                                        </button>
+                                    </Link>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
+    );
+}
+
+export default function SearchPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center font-sans font-medium text-gray-500">Loading destinations...</div>}>
+            <SearchContent />
+        </Suspense>
     );
 }

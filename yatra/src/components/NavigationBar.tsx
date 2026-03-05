@@ -35,15 +35,21 @@ export default function NavigationBar() {
 
             {/* Center: Nav links (desktop) */}
             <div className="hidden md:flex items-center gap-8">
-                {["Destinations", "Hotels", "Restaurants", "Experiences", "About"].map((item) => (
-                    <a
-                        key={item}
-                        href={`#${item.toLowerCase()}`}
+                {[
+                    { label: "Destinations", href: "/search" },
+                    { label: "Hotels", href: "/search?q=Hotels" },
+                    { label: "Restaurants", href: "/search?q=Restaurants" },
+                    { label: "Experiences", href: "/search" },
+                    { label: "About", href: "/dashboard/about" }
+                ].map((item) => (
+                    <Link
+                        key={item.label}
+                        href={item.href}
                         className="text-white/90 hover:text-white font-medium text-sm tracking-wide transition-colors relative group"
                     >
-                        {item}
+                        {item.label}
                         <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#F77F00] transition-all group-hover:w-full" />
-                    </a>
+                    </Link>
                 ))}
             </div>
 
@@ -62,15 +68,21 @@ export default function NavigationBar() {
             {/* Mobile dropdown menu */}
             {menuOpen && (
                 <div className="absolute top-full left-0 right-0 bg-[#1B4E66]/95 backdrop-blur-md border-t border-white/10 px-6 py-4 flex flex-col gap-4 md:hidden shadow-xl">
-                    {["Destinations", "Hotels", "Restaurants", "Experiences", "About"].map((item) => (
-                        <a
-                            key={item}
-                            href={`#${item.toLowerCase()}`}
+                    {[
+                        { label: "Destinations", href: "/search" },
+                        { label: "Hotels", href: "/search?q=Hotels" },
+                        { label: "Restaurants", href: "/search?q=Restaurants" },
+                        { label: "Experiences", href: "/search" },
+                        { label: "About", href: "/dashboard/about" }
+                    ].map((item) => (
+                        <Link
+                            key={item.label}
+                            href={item.href}
                             className="text-white/80 hover:text-white font-medium text-base py-1"
                             onClick={() => setMenuOpen(false)}
                         >
-                            {item}
-                        </a>
+                            {item.label}
+                        </Link>
                     ))}
                     <hr className="border-white/10" />
                     <div className="flex gap-3">

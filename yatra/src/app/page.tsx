@@ -26,13 +26,13 @@ export default function Home() {
             playsInline
             className="absolute inset-0 w-full h-full object-cover object-top"
           />
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-black/10" />
         </div>
 
         {/* ── LAYER 2 (z-10): "Embark Your Journey" headline — BELOW the foreground ── */}
         {/* Mountains will cut OVER the text creating a depth illusion */}
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-start pt-32 md:pt-36 px-4 pointer-events-none">
-          <h1 className="text-7xl md:text-9xl lg:text-[10rem] font-heading font-bold text-white/85 leading-[1.0] tracking-tight drop-shadow-2xl">
+          <h1 className="text-7xl md:text-9xl lg:text-[10rem] font-heading font-bold text-white/85 leading-[1.0] tracking-tight drop-shadow-2xl translate-y-[80px]">
             Embark Your Journey
           </h1>
         </div>
@@ -51,6 +51,9 @@ export default function Home() {
             priority
           />
         </div>
+
+        {/* ── GRADIENT OVERLAY (z-25): black at bottom, transparent at top — above foreground ── */}
+        <div className="absolute inset-0 z-25 pointer-events-none bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
         {/* ── LAYER 4 (z-30): Subtitle + Auth buttons — pinned to bottom ── */}
         <div className="absolute bottom-10 left-0 right-0 z-30 flex flex-col items-center gap-4 px-4 pointer-events-auto">
