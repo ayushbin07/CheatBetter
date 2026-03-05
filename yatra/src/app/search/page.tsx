@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin, Filter, Star, Mountain, Camera, Tent, ChevronRight, Heart, X } from "lucide-react";
+import { Search, MapPin, Filter, Star, Mountain, Camera, Tent, ChevronRight, Heart, X, ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -48,18 +48,140 @@ const DESTINATION_DATA = [
         tags: ["UNESCO", "Cultural", "Historic"],
         saved: false,
     },
+    {
+        id: 4,
+        name: "Chitwan National Park",
+        region: "Narayani",
+        category: "Wildlife",
+        rating: 4.6,
+        reviews: 2890,
+        duration: "4 days",
+        difficulty: "Easy",
+        image: "/kathmandu_valley_bento_1772693909729.png",
+        tags: ["Safari", "Jungle", "Rhinos"],
+        saved: false,
+    },
+    {
+        id: 5,
+        name: "Annapurna Circuit",
+        region: "Gandaki",
+        category: "Trekking",
+        rating: 4.9,
+        reviews: 4120,
+        duration: "18 days",
+        difficulty: "Hard",
+        image: "/everest_base_camp_card.png",
+        tags: ["Classic Trek", "Diverse", "Thorong La"],
+        saved: false,
+    },
+    {
+        id: 6,
+        name: "Rara Lake",
+        region: "Karnali",
+        category: "Lakes",
+        rating: 4.8,
+        reviews: 980,
+        duration: "7 days",
+        difficulty: "Moderate",
+        image: "/pokhara_lake_bento_1772693938781.png",
+        tags: ["Remote", "Crystal Clear", "Pristine"],
+        saved: false,
+    },
+    {
+        id: 7,
+        name: "Lumbini",
+        region: "Rupandehi",
+        category: "Temples",
+        rating: 4.5,
+        reviews: 6200,
+        duration: "2 days",
+        difficulty: "Easy",
+        image: "/kathmandu_valley_bento_1772693909729.png",
+        tags: ["Birthplace of Buddha", "Pilgrimage", "Peace"],
+        saved: false,
+    },
+    {
+        id: 8,
+        name: "Bandipur Village",
+        region: "Tanahun",
+        category: "Villages",
+        rating: 4.6,
+        reviews: 1420,
+        duration: "2 days",
+        difficulty: "Easy",
+        image: "/kathmandu_valley_bento_1772693909729.png",
+        tags: ["Newari", "Hilltop", "Traditional"],
+        saved: false,
+    },
+    {
+        id: 9,
+        name: "Manaslu Trek",
+        region: "Gorkha",
+        category: "Trekking",
+        rating: 4.8,
+        reviews: 1870,
+        duration: "16 days",
+        difficulty: "Hard",
+        image: "/everest_base_camp_card.png",
+        tags: ["Remote", "8000m Peak", "Tibetan Culture"],
+        saved: false,
+    },
+    {
+        id: 10,
+        name: "Tilicho Lake",
+        region: "Manang",
+        category: "Lakes",
+        rating: 4.7,
+        reviews: 2100,
+        duration: "10 days",
+        difficulty: "Hard",
+        image: "/pokhara_lake_bento_1772693938781.png",
+        tags: ["Highest Lake", "Extreme", "Breathtaking"],
+        saved: false,
+    },
+    {
+        id: 11,
+        name: "Bardia National Park",
+        region: "Bardiya",
+        category: "Wildlife",
+        rating: 4.5,
+        reviews: 1560,
+        duration: "4 days",
+        difficulty: "Easy",
+        image: "/kathmandu_valley_bento_1772693909729.png",
+        tags: ["Tigers", "Dolphins", "Remote Safari"],
+        saved: false,
+    },
+    {
+        id: 12,
+        name: "Ghandruk Village",
+        region: "Kaski",
+        category: "Villages",
+        rating: 4.7,
+        reviews: 2340,
+        duration: "3 days",
+        difficulty: "Moderate",
+        image: "/pokhara_lake_bento_1772693938781.png",
+        tags: ["Gurung Culture", "Mountain Views", "Homestay"],
+        saved: false,
+    },
 ];
 
 export default function SearchPage() {
     const [activeCategory, setActiveCategory] = useState("All");
     const [query, setQuery] = useState("");
     const [savedIds, setSavedIds] = useState<number[]>([2]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 6;
 
     const filtered = DESTINATION_DATA.filter(
         (d) =>
             (activeCategory === "All" || d.category === activeCategory) &&
             d.name.toLowerCase().includes(query.toLowerCase())
     );
+
+    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+    const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
     const toggleSaved = (id: number) => {
         setSavedIds((prev) =>
@@ -119,7 +241,7 @@ export default function SearchPage() {
                     {CATEGORIES.map((cat) => (
                         <button
                             key={cat}
-                            onClick={() => setActiveCategory(cat)}
+                            onClick={() => { setActiveCategory(cat); setCurrentPage(1); }}
                             className={`shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${activeCategory === cat
                                     ? "bg-[#2C7DA0] text-white shadow-md"
                                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -159,7 +281,7 @@ export default function SearchPage() {
                             layout
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                         >
-                            {filtered.map((dest, i) => (
+                            {paginated.map((dest, i) => (
                                 <motion.div
                                     key={dest.id}
                                     layout
@@ -249,6 +371,35 @@ export default function SearchPage() {
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-10">
+                        <button
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                            className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-[#2C7DA0] hover:text-white transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                        >
+                            <ChevronLeft size={16} />
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                            <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${currentPage === page ? "bg-[#2C7DA0] text-white shadow-md" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={currentPage === totalPages}
+                            className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-[#2C7DA0] hover:text-white transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                        >
+                            <ChevronRight size={16} />
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

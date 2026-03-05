@@ -1,17 +1,19 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import {
     Star, MapPin, Clock, Mountain, ChevronLeft, Heart, Share2,
-    Calendar, Users, Camera, ShieldCheck, CheckCircle2
+    Calendar, Users, Camera, ShieldCheck, CheckCircle2, X, ChevronRight, ZoomIn
 } from "lucide-react";
 
 const DECK_PHOTOS = [
     "/kathmandu_valley_bento_1772693909729.png",
     "/hero-bg.jpg",
     "/pokhara_lake_bento_1772693938781.png",
+    "/everest_base_camp_card.png",
 ];
 
 const HIGHLIGHTS = [
@@ -37,8 +39,50 @@ const REVIEWS = [
 ];
 
 export default function DestinationDetailPage() {
+    const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+    const [userRating, setUserRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
+
     return (
         <div className="min-h-screen bg-[#F8F9FA] font-sans">
+
+            {/* Image Preview Lightbox */}
+            <AnimatePresence>
+                {lightboxIdx !== null && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center"
+                        onClick={() => setLightboxIdx(null)}
+                    >
+                        <button onClick={() => setLightboxIdx(null)} className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"><X size={20} /></button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setLightboxIdx(i => i !== null ? (i - 1 + DECK_PHOTOS.length) % DECK_PHOTOS.length : 0); }}
+                            className="absolute left-4 md:left-8 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
+                        ><ChevronLeft size={24} /></button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setLightboxIdx(i => i !== null ? (i + 1) % DECK_PHOTOS.length : 0); }}
+                            className="absolute right-4 md:right-8 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors z-10"
+                        ><ChevronRight size={24} /></button>
+                        <motion.div
+                            key={lightboxIdx}
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="relative w-[90vw] h-[70vh] max-w-4xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <Image src={DECK_PHOTOS[lightboxIdx]} alt={`Gallery ${lightboxIdx + 1}`} fill className="object-contain" />
+                        </motion.div>
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                            {DECK_PHOTOS.map((_, i) => (
+                                <button key={i} onClick={(e) => { e.stopPropagation(); setLightboxIdx(i); }} className={`w-2.5 h-2.5 rounded-full transition-colors ${i === lightboxIdx ? "bg-white" : "bg-white/30"}`} />
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Back Navigation */}
             <div className="fixed top-5 left-5 z-50">
@@ -63,10 +107,16 @@ export default function DestinationDetailPage() {
                 {/* Photo gallery thumbnails */}
                 <div className="absolute bottom-6 right-6 flex gap-2">
                     {DECK_PHOTOS.map((photo, i) => (
-                        <div key={i} className="w-14 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md cursor-pointer hover:scale-105 transition-transform relative">
+                        <div key={i} onClick={() => setLightboxIdx(i)} className="w-14 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md cursor-pointer hover:scale-105 transition-transform relative group/thumb">
                             <Image src={photo} alt={`Photo ${i + 1}`} fill className="object-cover" />
+                            <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/30 transition-colors flex items-center justify-center">
+                                <ZoomIn size={16} className="text-white opacity-0 group-hover/thumb:opacity-100 transition-opacity" />
+                            </div>
                         </div>
                     ))}
+                    <button onClick={() => setLightboxIdx(0)} className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 text-white font-bold text-xs flex items-center justify-center hover:bg-white/30 transition-colors">
+                        +{DECK_PHOTOS.length}
+                    </button>
                 </div>
 
                 {/* Action buttons */}
@@ -170,6 +220,33 @@ export default function DestinationDetailPage() {
                                     <p className="text-gray-600 font-light text-sm leading-relaxed">{r.text}</p>
                                 </div>
                             ))}
+                        </div>
+
+                        {/* Interactive Rating System */}
+                        <div className="mt-6 bg-white border border-gray-100 rounded-2xl p-5">
+                            <h3 className="font-heading font-bold text-charcoal mb-3">Rate this destination</h3>
+                            <div className="flex items-center gap-1 mb-2">
+                                {[1, 2, 3, 4, 5].map(star => (
+                                    <button
+                                        key={star}
+                                        onMouseEnter={() => setHoverRating(star)}
+                                        onMouseLeave={() => setHoverRating(0)}
+                                        onClick={() => setUserRating(star)}
+                                        className="p-0.5 transition-transform hover:scale-110"
+                                    >
+                                        <Star
+                                            size={28}
+                                            className={`transition-colors ${(hoverRating || userRating) >= star ? "fill-[#F77F00] text-[#F77F00]" : "text-gray-300"}`}
+                                        />
+                                    </button>
+                                ))}
+                                {userRating > 0 && (
+                                    <span className="ml-2 text-sm font-semibold text-charcoal">{userRating}/5</span>
+                                )}
+                            </div>
+                            {userRating > 0 && (
+                                <p className="text-xs text-emerald-600 font-medium">Thanks for rating! Your feedback helps other travellers.</p>
+                            )}
                         </div>
                     </motion.div>
                 </div>

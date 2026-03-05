@@ -1,12 +1,55 @@
 "use client";
 
-import { useState } from "react";
-import { CloudLightning, MapPin, PlaneTakeoff, Clock, Calendar, Compass, Heart, X, Mountain, Utensils, Camera, Sun, ChevronRight, Bike } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { CloudLightning, MapPin, PlaneTakeoff, Clock, Calendar, Compass, Heart, X, Mountain, Utensils, Camera, Sun, ChevronRight, Bike, ChevronLeft, Star, ArrowLeftRight, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useToast } from "@/components/ToastProvider";
+
+/* ── Data ── */
+const MONTHLY_STATS = [
+    { month: "Jan", trips: 1, hours: 12 },
+    { month: "Feb", trips: 0, hours: 0 },
+    { month: "Mar", trips: 2, hours: 24 },
+    { month: "Apr", trips: 1, hours: 8 },
+    { month: "May", trips: 0, hours: 0 },
+    { month: "Jun", trips: 3, hours: 36 },
+    { month: "Jul", trips: 2, hours: 20 },
+    { month: "Aug", trips: 1, hours: 14 },
+    { month: "Sep", trips: 0, hours: 0 },
+    { month: "Oct", trips: 4, hours: 48 },
+    { month: "Nov", trips: 2, hours: 18 },
+    { month: "Dec", trips: 1, hours: 10 },
+];
+
+const MAP_MARKERS = [
+    { id: "kathmandu", name: "Kathmandu", x: 55, y: 42, desc: "Cultural capital, UNESCO sites", temp: "24°C" },
+    { id: "pokhara", name: "Pokhara", x: 38, y: 38, desc: "Lake city, Annapurna gateway", temp: "22°C" },
+    { id: "chitwan", name: "Chitwan", x: 42, y: 62, desc: "Wildlife safari, jungle tours", temp: "28°C" },
+    { id: "lumbini", name: "Lumbini", x: 30, y: 65, desc: "Birthplace of Buddha", temp: "26°C" },
+    { id: "ebc", name: "Everest BC", x: 78, y: 25, desc: "World's highest base camp", temp: "−8°C" },
+    { id: "nagarkot", name: "Nagarkot", x: 62, y: 38, desc: "Sunrise over Himalayas", temp: "18°C" },
+];
+
+const COMPARE_DESTINATIONS = [
+    { name: "Kathmandu", altitude: "1,400m", bestTime: "Oct–Dec", budget: "$30/day", style: "Cultural", rating: 4.8, image: "/kathmandu_valley_bento_1772693909729.png" },
+    { name: "Pokhara", altitude: "827m", bestTime: "Sep–Nov", budget: "$25/day", style: "Adventure", rating: 4.7, image: "/pokhara_lake_bento_1772693938781.png" },
+];
+
+const RECOMMENDATIONS = [
+    { id: 1, name: "Annapurna Circuit", region: "Gandaki", rating: 4.9, image: "/kathmandu_valley_bento_1772693909729.png", tag: "Trending" },
+    { id: 2, name: "Chitwan Safari", region: "Narayani", rating: 4.6, image: "/pokhara_lake_bento_1772693938781.png", tag: "Popular" },
+    { id: 3, name: "Langtang Valley", region: "Bagmati", rating: 4.8, image: "/kathmandu_valley_bento_1772693909729.png", tag: "Hidden Gem" },
+    { id: 4, name: "Upper Mustang", region: "Dhaulagiri", rating: 4.9, image: "/pokhara_lake_bento_1772693938781.png", tag: "Exclusive" },
+    { id: 5, name: "Rara Lake", region: "Karnali", rating: 4.7, image: "/kathmandu_valley_bento_1772693909729.png", tag: "Remote" },
+];
 
 export default function DashboardPage() {
     const [showItinerary, setShowItinerary] = useState(false);
+    const [activeMarker, setActiveMarker] = useState<string | null>(null);
+    const [chartMetric, setChartMetric] = useState<"trips" | "hours">("trips");
+    const carouselRef = useRef<HTMLDivElement>(null);
+    const { toast } = useToast();
 
     return (
         <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -194,6 +237,134 @@ export default function DashboardPage() {
                         <p className="text-white/80 text-sm font-medium">Saved 2 days ago</p>
                     </div>
                 </Link>
+            </div>
+
+            {/* ───────── Interactive Charts ───────── */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg font-heading font-bold text-charcoal">Travel Statistics</h2>
+                    <div className="flex gap-1 bg-gray-100 rounded-lg p-0.5">
+                        {(["trips", "hours"] as const).map(m => (
+                            <button key={m} onClick={() => setChartMetric(m)} className={`px-3 py-1 text-xs font-semibold rounded-md capitalize transition-colors ${chartMetric === m ? "bg-white text-[#2C7DA0] shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>{m}</button>
+                        ))}
+                    </div>
+                </div>
+                <div className="flex items-end gap-2 h-48">
+                    {MONTHLY_STATS.map((s) => {
+                        const val = s[chartMetric];
+                        const max = Math.max(...MONTHLY_STATS.map(d => d[chartMetric]));
+                        const pct = max > 0 ? (val / max) * 100 : 0;
+                        return (
+                            <div key={s.month} className="flex-1 flex flex-col items-center gap-1 group/bar">
+                                <span className="text-[10px] font-bold text-[#2C7DA0] opacity-0 group-hover/bar:opacity-100 transition-opacity">{val}</span>
+                                <div className="w-full bg-gray-100 rounded-t-md relative" style={{ height: "160px" }}>
+                                    <div className="absolute bottom-0 w-full rounded-t-md bg-gradient-to-t from-[#2C7DA0] to-[#6FB3D2] transition-all duration-500 group-hover/bar:from-[#F77F00] group-hover/bar:to-[#F9A825]" style={{ height: `${Math.max(pct, 4)}%` }} />
+                                </div>
+                                <span className="text-[10px] text-gray-400 font-medium">{s.month}</span>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* ───────── Map-Based Interface ───────── */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <h2 className="text-lg font-heading font-bold text-charcoal mb-4">Explore Nepal</h2>
+                <div className="relative bg-gradient-to-br from-emerald-50 via-sky-50 to-amber-50 rounded-xl overflow-hidden" style={{ height: 340 }}>
+                    {/* Simple SVG Nepal outline */}
+                    <svg viewBox="0 0 100 80" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
+                        <path d="M10,45 Q15,30 25,28 Q35,25 45,22 Q55,18 65,20 Q75,22 85,28 Q90,32 92,38 Q90,50 80,58 Q70,65 55,68 Q40,70 25,65 Q15,58 10,45Z" fill="none" stroke="#2C7DA0" strokeWidth="0.5" strokeDasharray="2,1" opacity="0.4" />
+                        {MAP_MARKERS.map(m => (
+                            <g key={m.id} className="cursor-pointer" onClick={() => { setActiveMarker(activeMarker === m.id ? null : m.id); toast(`Viewing ${m.name}`, "info"); }}>
+                                <circle cx={m.x} cy={m.y} r={activeMarker === m.id ? 3 : 2} fill={activeMarker === m.id ? "#F77F00" : "#2C7DA0"} className="transition-all duration-300" />
+                                <circle cx={m.x} cy={m.y} r={activeMarker === m.id ? 5 : 0} fill="none" stroke="#F77F00" strokeWidth="0.5" className="transition-all duration-300" opacity={activeMarker === m.id ? 1 : 0} />
+                                <text x={m.x} y={m.y - 4} textAnchor="middle" fontSize="2.5" fill="#1a1a2e" fontWeight="600">{m.name}</text>
+                            </g>
+                        ))}
+                    </svg>
+                    {/* Active marker tooltip */}
+                    {activeMarker && (() => {
+                        const m = MAP_MARKERS.find(m => m.id === activeMarker)!;
+                        return (
+                            <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-xl p-4 shadow-lg border border-gray-100 animate-[fadeIn_200ms_ease-out]">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="font-heading font-bold text-charcoal">{m.name}</h3>
+                                        <p className="text-xs text-gray-500">{m.desc}</p>
+                                    </div>
+                                    <span className="text-sm font-bold text-[#F77F00]">{m.temp}</span>
+                                </div>
+                            </div>
+                        );
+                    })()}
+                </div>
+            </div>
+
+            {/* ───────── Comparison View ───────── */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="flex items-center gap-2 mb-6">
+                    <ArrowLeftRight size={18} className="text-[#2C7DA0]" />
+                    <h2 className="text-lg font-heading font-bold text-charcoal">Compare Destinations</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {COMPARE_DESTINATIONS.map((d, i) => (
+                        <div key={d.name} className="border border-gray-100 rounded-xl overflow-hidden">
+                            <div className="relative h-32">
+                                <Image src={d.image} alt={d.name} fill className="object-cover" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                <h3 className="absolute bottom-3 left-4 text-white font-heading font-bold text-lg">{d.name}</h3>
+                            </div>
+                            <div className="p-4 space-y-3">
+                                {[
+                                    { label: "Altitude", value: d.altitude },
+                                    { label: "Best Season", value: d.bestTime },
+                                    { label: "Budget", value: d.budget },
+                                    { label: "Style", value: d.style },
+                                    { label: "Rating", value: `⭐ ${d.rating}` },
+                                ].map(row => (
+                                    <div key={row.label} className="flex justify-between text-sm">
+                                        <span className="text-gray-400">{row.label}</span>
+                                        <span className="font-semibold text-charcoal">{row.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div className="mt-4 text-center">
+                    <span className="inline-flex items-center gap-1 text-xs text-[#2C7DA0] font-semibold bg-[#2C7DA0]/10 px-3 py-1.5 rounded-full">
+                        <ArrowLeftRight size={12} /> Side-by-side comparison
+                    </span>
+                </div>
+            </div>
+
+            {/* ───────── Recommendation Carousel ───────── */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-heading font-bold text-charcoal">Recommended For You</h2>
+                    <div className="flex gap-2">
+                        <button onClick={() => carouselRef.current?.scrollBy({ left: -260, behavior: "smooth" })} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-[#2C7DA0] hover:text-white transition-colors"><ChevronLeft size={16} /></button>
+                        <button onClick={() => carouselRef.current?.scrollBy({ left: 260, behavior: "smooth" })} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-[#2C7DA0] hover:text-white transition-colors"><ChevronRight size={16} /></button>
+                    </div>
+                </div>
+                <div ref={carouselRef} className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2" style={{ scrollbarWidth: "none" }}>
+                    {RECOMMENDATIONS.map(r => (
+                        <div key={r.id} className="min-w-[240px] snap-start bg-gray-50 rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-shadow group/card flex-shrink-0">
+                            <div className="relative h-32">
+                                <Image src={r.image} alt={r.name} fill className="object-cover group-hover/card:scale-105 transition-transform duration-500" />
+                                <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider bg-white/90 text-[#F77F00] px-2 py-0.5 rounded-full">{r.tag}</span>
+                            </div>
+                            <div className="p-3">
+                                <h3 className="font-heading font-bold text-sm text-charcoal">{r.name}</h3>
+                                <p className="text-xs text-gray-400">{r.region}</p>
+                                <div className="flex items-center gap-1 mt-1">
+                                    <Star size={12} className="text-amber-400" fill="currentColor" />
+                                    <span className="text-xs font-semibold text-charcoal">{r.rating}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Itinerary Slide-Over Panel */}
