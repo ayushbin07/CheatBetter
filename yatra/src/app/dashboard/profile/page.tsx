@@ -29,7 +29,7 @@ export default function ProfilePage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="relative overflow-hidden rounded-[2rem] h-52 shadow-sm"
             >
-                <Image src="/hero-bg.png" alt="Cover" fill className="object-cover brightness-50" />
+                <Image src="/hero-bg.jpg" alt="Cover" fill className="object-cover brightness-50" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end gap-5">

@@ -78,7 +78,7 @@ export default function SearchPage() {
             {/* Hero Search Banner */}
             <div className="relative w-full h-64 md:h-80 overflow-hidden">
                 <Image
-                    src="/hero-bg.png"
+                    src="/hero-bg.jpg"
                     alt="Nepal Mountains"
                     fill
                     className="object-cover scale-105 brightness-75"
