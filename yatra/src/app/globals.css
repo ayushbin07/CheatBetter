@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --color-himalayanBlue: #2C7DA0;
+  --color-deepMountainBlue: #1B4E66;
+  --color-glacierBlue: #6FB3D2;
+  --color-sunriseOrange: #F77F00;
+  --color-sunsetOrange: #C75A00;
+  --color-warmSand: #FFD6A3;
+  --color-forestGreen: #2D6A4F;
+  --color-mossGreen: #40916C;
+  --color-cloudWhite: #F8F9FA;
+  --color-pureWhite: #FFFFFF;
+  --color-stoneGrey: #E9ECEF;
+  --color-charcoal: #212529;
+
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-poppins);
+}
+
+/* Base resets & utilities */
+body {
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Generic Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Remove default scrollbar for cleaner look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-cloudWhite);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-himalayanBlue);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-deepMountainBlue);
+}
