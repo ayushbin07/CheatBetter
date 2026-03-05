@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { MapPin, Calendar, Users, Search } from "lucide-react";
-import Link from "next/link";
 
 export default function SearchModule() {
     const [activeTab, setActiveTab] = useState("Hotels");

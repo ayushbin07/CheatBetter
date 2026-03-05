@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, CheckCircle2, User, Mountain, Ship, Building2, Binoculars, Map, Camera, Heart, Trees } from "lucide-react";
+import { ArrowLeft, CheckCircle2, User, Mountain, Ship, Building2, Binoculars, Map, Camera, Heart, Trees } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -314,7 +314,7 @@ export default function OnboardingWizard() {
                                     >
                                         <CheckCircle2 size={48} className="text-white" />
                                     </motion.div>
-                                    <h2 className="text-4xl font-heading font-bold text-white mb-4">You're ready.</h2>
+                                    <h2 className="text-4xl font-heading font-bold text-white mb-4">You&apos;re ready.</h2>
                                     <p className="text-white/80 mb-10 text-lg">Your adventure in Nepal begins now.</p>
 
                                     <Link href="/dashboard" className="inline-block w-full">
