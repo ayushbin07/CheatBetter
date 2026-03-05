@@ -23,6 +23,7 @@ export default function Home() {
             src="/clouds.mp4"
             autoPlay
             muted
+            loop
             playsInline
             className="absolute inset-0 w-full h-full object-cover object-top"
           />

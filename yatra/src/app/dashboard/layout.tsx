@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Home, Compass, Heart, MessageSquare, Settings, LogOut, Search, Bell, Menu, X, Info } from "lucide-react";
 import Link from "next/link";
 
@@ -20,16 +20,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (searchQuery.trim()) {
-            router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-        }
-    };
 
     return (
         <div className="min-h-screen bg-[#F8F9FA] flex overflow-hidden">
@@ -95,16 +86,10 @@ export default function DashboardLayout({
                         <button className="md:hidden p-2 text-gray-500 bg-gray-50 rounded-lg" onClick={() => setMobileMenuOpen(true)}>
                             <Menu size={24} />
                         </button>
-                        <form onSubmit={handleSearch} className="relative hidden sm:block">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                            <input
-                                type="text"
-                                placeholder="Search destinations..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 pr-4 py-2 bg-gray-50 border-none rounded-full text-sm font-medium outline-none focus:ring-2 focus:ring-[#2C7DA0]/20 w-64 transition-all"
-                            />
-                        </form>
+                        <Link href="/search" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#2C7DA0] text-white rounded-full text-sm font-semibold hover:bg-[#1B4E66] transition-colors shadow-sm">
+                            <Search size={16} />
+                            Search
+                        </Link>
                     </div>
 
                     <div className="flex items-center gap-4">
