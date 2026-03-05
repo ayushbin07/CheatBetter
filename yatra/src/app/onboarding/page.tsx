@@ -46,6 +46,20 @@ export default function OnboardingWizard() {
     const nextStep = () => setStep((p) => Math.min(TOTAL_STEPS, p + 1));
     const prevStep = () => setStep((p) => Math.max(1, p - 1));
 
+    const canProceed = (): boolean => {
+        switch (step) {
+            case 1: return true;
+            case 2: return formData.username.trim().length > 0 && formData.password.length >= 8 && passwordsMatch;
+            case 3: return formData.firstName.trim().length > 0 && formData.lastName.trim().length > 0;
+            case 4: return formData.interests.length >= 3;
+            case 5: return formData.travelStyle !== "";
+            case 6: return formData.budget !== "";
+            case 7: return formData.activityInterests.length >= 3;
+            case 8: return true;
+            default: return true;
+        }
+    };
+
     const toggleSelection = (key: "interests" | "activityInterests" | "notifications", value: string) => {
         setFormData((prev) => {
             const current = prev[key];
@@ -281,7 +295,7 @@ export default function OnboardingWizard() {
                             {step === 4 && (
                                 <div className="w-full my-auto flex flex-col h-full justify-center">
                                     <h2 className="text-3xl font-heading font-bold text-white mb-2">What do you love?</h2>
-                                    <p className="text-white/70 mb-8 font-light">Select your travel interests. (Multiple)</p>
+                                    <p className="text-white/70 mb-8 font-light">Select your travel interests. (Minimum 3)</p>
 
                                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
                                         {[
@@ -365,7 +379,7 @@ export default function OnboardingWizard() {
                             {step === 7 && (
                                 <div className="w-full my-auto flex flex-col h-full justify-center">
                                     <h2 className="text-3xl font-heading font-bold text-white mb-2">Top Activities?</h2>
-                                    <p className="text-white/70 mb-8 font-light">Select activities you enjoy. (Multiple)</p>
+                                    <p className="text-white/70 mb-8 font-light">Select activities you enjoy. (Minimum 3)</p>
 
                                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                                         {[
@@ -454,10 +468,24 @@ export default function OnboardingWizard() {
 
                 {/* Footer Buttons */}
                 {step < TOTAL_STEPS && (
-                    <div className="px-8 pb-8 flex justify-end">
+                    <div className="px-8 pb-8 flex items-center justify-between">
+                        {!canProceed() && step > 1 ? (
+                            <p className="text-white/40 text-xs font-medium">
+                                {step === 2 && "Fill in username, password (8+ chars) & confirm"}
+                                {step === 3 && "Enter your first and last name"}
+                                {step === 4 && `Select ${3 - formData.interests.length} more interest${3 - formData.interests.length === 1 ? "" : "s"}`}
+                                {step === 5 && "Choose a travel style"}
+                                {step === 6 && "Pick a budget range"}
+                                {step === 7 && `Select ${3 - formData.activityInterests.length} more activit${3 - formData.activityInterests.length === 1 ? "y" : "ies"}`}
+                            </p>
+                        ) : <div />}
                         <button
                             onClick={nextStep}
-                            className="bg-gradient-to-r from-[#2C7DA0] to-[#1B4E66] hover:from-[#1B4E66] hover:to-[#0F3142] text-white px-8 py-3 rounded-full font-semibold transition-all shadow-lg hover:-translate-y-0.5"
+                            disabled={!canProceed()}
+                            className={`px-8 py-3 rounded-full font-semibold transition-all shadow-lg ${canProceed()
+                                ? "bg-gradient-to-r from-[#2C7DA0] to-[#1B4E66] hover:from-[#1B4E66] hover:to-[#0F3142] text-white hover:-translate-y-0.5"
+                                : "bg-white/10 text-white/30 cursor-not-allowed shadow-none"
+                            }`}
                         >
                             {step === 1 ? "Start" : step === TOTAL_STEPS - 1 ? "Finish" : "Next"}
                         </button>

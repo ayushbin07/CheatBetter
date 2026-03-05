@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CloudLightning, MapPin, PlaneTakeoff, Clock, Calendar, Compass, Heart, X, Mountain, Utensils, Camera, Sun, ChevronRight } from "lucide-react";
+import { CloudLightning, MapPin, PlaneTakeoff, Clock, Calendar, Compass, Heart, X, Mountain, Utensils, Camera, Sun, ChevronRight, Bike } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,7 +18,18 @@ export default function DashboardPage() {
                     <p className="text-gray-500 font-medium">Your next adventure to Nepal is 14 days away.</p>
                 </div>
 
-                <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3">
+                    <a href="/task1/index.html" className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow">
+                        <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-[#F77F00]">
+                            <Bike size={20} />
+                        </div>
+                        <div>
+                            <div className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-0.5">Rent</div>
+                            <div className="font-bold text-sm text-charcoal">Scooter</div>
+                        </div>
+                    </a>
+
+                    <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow">
                     <div>
                         <div className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-0.5">Kathmandu</div>
                         <div className="font-bold text-lg text-charcoal">24°C</div>
@@ -26,6 +37,7 @@ export default function DashboardPage() {
                     <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-[#2C7DA0]">
                         <CloudLightning size={20} />
                     </div>
+                </div>
                 </div>
             </div>
 

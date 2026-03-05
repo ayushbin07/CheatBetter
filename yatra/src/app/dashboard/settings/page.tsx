@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Settings, User, Bell, Globe, Moon, Shield, ExternalLink, ChevronRight } from "lucide-react";
+import { Settings, User, Bell, Globe, Moon, Shield, ChevronRight } from "lucide-react";
 
 function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
     return (
@@ -134,26 +134,6 @@ export default function SettingsPage() {
                             <option value="private">Private</option>
                         </select>
                     </div>
-                </div>
-            </section>
-
-            {/* External Link — Task 1 */}
-            <section className="space-y-1">
-                <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider px-1 mb-3">More</h2>
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
-                    <a
-                        href="/task1/index.html"
-                        className="flex items-center justify-between px-6 py-5 hover:bg-gray-50 transition-colors rounded-2xl"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-[#F77F00]/10 text-[#F77F00] flex items-center justify-center"><ExternalLink size={18} /></div>
-                            <div>
-                                <p className="font-semibold text-charcoal text-sm">Scooter Rental Service</p>
-                                <p className="text-xs text-gray-400">Explore our partner scooter rental page</p>
-                            </div>
-                        </div>
-                        <ChevronRight size={18} className="text-gray-300" />
-                    </a>
                 </div>
             </section>
         </div>
