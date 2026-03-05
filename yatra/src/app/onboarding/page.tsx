@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, CheckCircle2, User, Mountain, Ship, Building2, Binoculars, Map, Camera, Heart, Trees } from "lucide-react";
+import { ArrowLeft, CheckCircle2, User, Mountain, Ship, Building2, Binoculars, Map, Camera, Heart, Trees, Lock, Eye, EyeOff, ShieldCheck, ShieldAlert } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,6 +12,8 @@ export default function OnboardingWizard() {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         username: "",
+        password: "",
+        confirmPassword: "",
         firstName: "",
         lastName: "",
         interests: [] as string[],
@@ -20,6 +22,26 @@ export default function OnboardingWizard() {
         activityInterests: [] as string[],
         notifications: [] as string[],
     });
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const getPasswordStrength = (pw: string): { label: string; color: string; width: string; score: number } => {
+        if (!pw) return { label: "", color: "", width: "0%", score: 0 };
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (pw.length >= 12) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        if (score <= 1) return { label: "Weak", color: "bg-red-400", width: "25%", score };
+        if (score <= 2) return { label: "Fair", color: "bg-amber-400", width: "50%", score };
+        if (score <= 3) return { label: "Good", color: "bg-yellow-300", width: "75%", score };
+        return { label: "Strong", color: "bg-emerald-400", width: "100%", score };
+    };
+
+    const passwordStrength = getPasswordStrength(formData.password);
+    const passwordsMatch = formData.confirmPassword.length > 0 && formData.password === formData.confirmPassword;
 
     const nextStep = () => setStep((p) => Math.min(TOTAL_STEPS, p + 1));
     const prevStep = () => setStep((p) => Math.max(1, p - 1));
@@ -39,7 +61,7 @@ export default function OnboardingWizard() {
         <div className="min-h-screen relative flex items-center justify-center p-4 selection:bg-[#F77F00]/30 overflow-hidden">
             {/* Background (Persists from Landing) */}
             <div className="absolute inset-0 z-0">
-                <Image src="/hero-bg.png" alt="Background" fill className="object-cover scale-105 blur-[20px] brightness-[0.7] saturate-[1.2]" />
+                <Image src="/hero-bg.jpg" alt="Background" fill className="object-cover scale-105 blur-[20px] brightness-[0.7] saturate-[1.2]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1B4E66]/60 via-transparent to-black/30"></div>
             </div>
 
@@ -112,20 +134,122 @@ export default function OnboardingWizard() {
 
                             {step === 2 && (
                                 <div className="w-full max-w-sm mx-auto my-auto">
-                                    <h2 className="text-3xl font-heading font-bold text-white mb-2">Choose a username</h2>
-                                    <p className="text-white/70 mb-8 font-light">This is how you will be known in the Yatra community.</p>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#2C7DA0]">
-                                            <User size={20} />
+                                    <h2 className="text-3xl font-heading font-bold text-white mb-2">Create your account</h2>
+                                    <p className="text-white/70 mb-6 font-light">Choose a username and set a secure password.</p>
+
+                                    <div className="space-y-4">
+                                        {/* Username */}
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#2C7DA0]">
+                                                <User size={18} />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. mountain_explorer"
+                                                value={formData.username}
+                                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/90 backdrop-blur-sm text-charcoal outline-none focus:ring-4 focus:ring-[#6FB3D2]/30 transition-all font-medium placeholder:text-charcoal/40"
+                                                autoFocus
+                                            />
                                         </div>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. mountain_explorer"
-                                            value={formData.username}
-                                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                            className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/90 backdrop-blur-sm text-charcoal outline-none focus:ring-4 focus:ring-[#6FB3D2]/30 transition-all font-medium"
-                                            autoFocus
-                                        />
+
+                                        {/* Password */}
+                                        <div>
+                                            <div className="relative">
+                                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#2C7DA0]">
+                                                    <Lock size={18} />
+                                                </div>
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder="Password"
+                                                    value={formData.password}
+                                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                    className="w-full pl-11 pr-11 py-3.5 rounded-xl bg-white/90 backdrop-blur-sm text-charcoal outline-none focus:ring-4 focus:ring-[#6FB3D2]/30 transition-all font-medium placeholder:text-charcoal/40"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword((v) => !v)}
+                                                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-charcoal/40 hover:text-charcoal/70 transition-colors"
+                                                >
+                                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </button>
+                                            </div>
+
+                                            {/* Strength Bar */}
+                                            {formData.password.length > 0 && (
+                                                <div className="mt-2 px-1">
+                                                    <div className="w-full h-1.5 rounded-full bg-white/20 overflow-hidden">
+                                                        <motion.div
+                                                            animate={{ width: passwordStrength.width }}
+                                                            transition={{ duration: 0.3 }}
+                                                            className={`h-full rounded-full ${passwordStrength.color}`}
+                                                        />
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 mt-1.5">
+                                                        {passwordStrength.score >= 4
+                                                            ? <ShieldCheck size={13} className="text-emerald-400" />
+                                                            : <ShieldAlert size={13} className="text-amber-400" />
+                                                        }
+                                                        <span className={`text-xs font-semibold ${
+                                                            passwordStrength.label === "Strong" ? "text-emerald-400" :
+                                                            passwordStrength.label === "Good" ? "text-yellow-300" :
+                                                            passwordStrength.label === "Fair" ? "text-amber-400" : "text-red-400"
+                                                        }`}>{passwordStrength.label} password</span>
+                                                        <span className="text-white/40 text-xs ml-auto">
+                                                            {passwordStrength.label === "Weak" && "Add uppercase, numbers & symbols"}
+                                                            {passwordStrength.label === "Fair" && "Try adding numbers or symbols"}
+                                                            {passwordStrength.label === "Good" && "Almost there!"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Confirm Password */}
+                                        <div>
+                                            <div className="relative">
+                                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#2C7DA0]">
+                                                    <Lock size={18} />
+                                                </div>
+                                                <input
+                                                    type={showConfirm ? "text" : "password"}
+                                                    placeholder="Confirm password"
+                                                    value={formData.confirmPassword}
+                                                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                                    className={`w-full pl-11 pr-11 py-3.5 rounded-xl bg-white/90 backdrop-blur-sm text-charcoal outline-none transition-all font-medium placeholder:text-charcoal/40 ${
+                                                        formData.confirmPassword.length > 0
+                                                            ? passwordsMatch
+                                                                ? "focus:ring-4 focus:ring-emerald-400/40 ring-2 ring-emerald-400/60"
+                                                                : "focus:ring-4 focus:ring-red-400/40 ring-2 ring-red-400/60"
+                                                            : "focus:ring-4 focus:ring-[#6FB3D2]/30"
+                                                    }`}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirm((v) => !v)}
+                                                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-charcoal/40 hover:text-charcoal/70 transition-colors"
+                                                >
+                                                    {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </button>
+                                            </div>
+
+                                            {/* Match feedback */}
+                                            {formData.confirmPassword.length > 0 && (
+                                                <div className="flex items-center gap-1.5 mt-2 px-1">
+                                                    {passwordsMatch ? (
+                                                        <>
+                                                            <CheckCircle2 size={13} className="text-emerald-400" />
+                                                            <span className="text-xs font-semibold text-emerald-400">Passwords match</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <ShieldAlert size={13} className="text-red-400" />
+                                                            <span className="text-xs font-semibold text-red-400">Passwords do not match</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             )}

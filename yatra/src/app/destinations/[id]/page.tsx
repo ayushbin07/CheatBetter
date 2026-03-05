@@ -10,7 +10,7 @@ import {
 
 const DECK_PHOTOS = [
     "/kathmandu_valley_bento_1772693909729.png",
-    "/hero-bg.png",
+    "/hero-bg.jpg",
     "/pokhara_lake_bento_1772693938781.png",
 ];
 
